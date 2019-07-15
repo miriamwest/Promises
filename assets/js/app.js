@@ -1,3 +1,4 @@
+var loggedInUser = null;
 $("#login").click(function(){
 	fetch()
 	fetch('https://jsonplaceholder.typicode.com/users?username=' + 
@@ -13,22 +14,30 @@ $("#login").click(function(){
 
 	$("#name").html(user.name);
 
-	fetch('http://jsonplaceholder.typicode.com/posts' + 
-		$("#posts").val())
-	$("#posts").show();
+	loggedInUser = user;
 
-	.then(function(results){ //serial
-		var users = results[];
-		var posts = results[];
-		var albums = results[];
+	var userPosts = fetch('https://jsonplaceholder.typicode.com/posts?userId=' + user.id);
+	var userAlbums = fetch('https://jsonplaceholder.typicode.com/albums?userId=' + user.id);
 
-	return Promise.All([users, posts, albums]); 
-})
-
-
-
+	return Promise.all([userPosts, userAlbums]);
 	})
-	.catch(function(error){
-		alert(error);
+	.then(function(results){
+		var posts = results[0].json;
+		var albums = results[1].json;
+
+	posts.forEach(function(post){
+				var li = $('<li></li>');
+				li.text(post.title);
+				$("#posts").append(li);
+			})
+
+	albums.forEach(function(album){
+				var li = $('<li></li>');
+				li.text(album.title);
+				$('#albums').append(li);
+			})
 	})
-})
+		.catch(function(error){
+			alert(error);
+		})
+	
